@@ -7,7 +7,7 @@ This is the XP Framework implementation of the [Net o' brev specification](https
 ```sh
 $ curl -L https://github.com/netobrev/spec/archive/master.zip > spec.zip
 $ unzip spec.zip
-$ unittest src/test/php/ -a spec-master/examples/balances/uber.json
+$ unittest src/test/php/ -a spec-master/examples
 [....]
 
 ✓: 4/4 run (0 skipped), 4 succeeded, 0 failed
