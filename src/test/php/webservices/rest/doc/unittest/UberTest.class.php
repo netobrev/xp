@@ -27,12 +27,12 @@ class UberTest extends \unittest\TestCase {
   }
 
   /**
-   * Returns input from the uber.json files
+   * Returns schema from the uber.json files
    *
    * @param  string $named
    * @return php.Iterator
    */
-  private function input($named) {
+  private function schema($named) {
     foreach ($this->input as $file) {
       $input= Json::read(new StreamInput($file->in()));
       foreach ($input['resources'] as $resource) {
@@ -46,12 +46,12 @@ class UberTest extends \unittest\TestCase {
     }
   }
 
-  #[@test, @values(source= 'input', args= ['body'])]
+  #[@test, @values(source= 'schema', args= ['body'])]
   public function verify_request($schema, $example) {
     $schema->validate(Json::read($example['request']['payload']));
   }
 
-  #[@test, @values(source= 'input', args= ['returns'])]
+  #[@test, @values(source= 'schema', args= ['returns'])]
   public function verify_successful_response($schema, $example) {
     if ($example['response']['code'] < 300) {
       $schema->validate(Json::read($example['response']['payload']));
