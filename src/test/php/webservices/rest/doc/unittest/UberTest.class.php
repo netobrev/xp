@@ -26,42 +26,35 @@ class UberTest extends \unittest\TestCase {
     }
   }
 
-  /** @return php.Iterator */
-  private function input() {
+  /**
+   * Returns input from the uber.json files
+   *
+   * @param  string $named
+   * @return php.Iterator
+   */
+  private function input($named) {
     foreach ($this->input as $file) {
       $input= Json::read(new StreamInput($file->in()));
       foreach ($input['resources'] as $resource) {
-        $body= isset($resource['body']) ? new JsonSchema(Json::read($resource['body']['schema'])) : null;
-        $returns= isset($resource['returns']) ? new JsonSchema(Json::read($resource['returns']['schema'])) : null;
-        foreach ($resource['examples'] as $example) {
-          yield [$example, $body, $returns];
+        if (isset($resource[$named])) {
+          $schema= new JsonSchema(Json::read($resource[$named]['schema']));
+          foreach ($resource['examples'] as $example) {
+            yield [$schema, $example];
+          }
         }
       }
     }
   }
 
-  /**
-   * Assertion helper: Validate JSON schema against payload
-   *
-   * @param  webservices.rest.doc.JsonSchema $schema
-   * @param  [:var] $exchange
-   * @throws unittest.AssertionFailedError
-   */
-  private function assertValidates($schema, $exchange) {
-    if (isset($exchange['payload'])) {
-      $schema->validate(Json::read($exchange['payload']));
-    }
+  #[@test, @values(source= 'input', args= ['body'])]
+  public function verify_request($schema, $example) {
+    $schema->validate(Json::read($example['request']['payload']));
   }
 
-  #[@test, @values(source= 'input')]
-  public function verify_request($example, $body, $returns) {
-    $this->assertValidates($body, $example['request']);
-  }
-
-  #[@test, @values(source= 'input')]
-  public function verify_successful_response($example, $body, $returns) {
+  #[@test, @values(source= 'input', args= ['returns'])]
+  public function verify_successful_response($schema, $example) {
     if ($example['response']['code'] < 300) {
-      $this->assertValidates($returns, $example['response']);
+      $schema->validate(Json::read($example['response']['payload']));
     }
   }
 }
