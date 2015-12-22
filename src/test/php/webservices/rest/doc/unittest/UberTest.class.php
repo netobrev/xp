@@ -46,6 +46,18 @@ class UberTest extends \unittest\TestCase {
     }
   }
 
+  private function statuscodes() {
+    foreach ($this->input as $file) {
+      $input= Json::read(new StreamInput($file->in()));
+      foreach ($input['resources'] as $resource) {
+        $statuscodes= $resource['status_codes']['table'];
+        foreach ($resource['examples'] as $example) {
+          yield [$statuscodes, $example];
+        }
+      }
+    }
+  }
+
   #[@test, @values(source= 'schema', args= ['body'])]
   public function verify_request($schema, $example) {
     $schema->validate(Json::read($example['request']['payload']));
@@ -56,5 +68,13 @@ class UberTest extends \unittest\TestCase {
     if ($example['response']['code'] < 300) {
       $schema->validate(Json::read($example['response']['payload']));
     }
+  }
+
+  #[@test, @values(source= 'statuscodes')]
+  public function verify_all_examples_statuscodes_are_documented($statuscodes, $example) {
+    foreach ($statuscodes as $status) {
+      if ($status['code'] === $example['response']['code']) return;
+    }
+    $this->fail('No example for statuscode '.$example['response']['code'], null, 'Documented');
   }
 }
