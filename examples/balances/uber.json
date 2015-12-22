@@ -1,0 +1,77 @@
+{
+  "resources": [
+    {
+      "title": "Get balance",
+      "verb": "GET",
+      "path": "/balances",
+      "uri": "/balances/{id}",
+      "raw": "GET /balances/{id}\n\nEvery user has a given balance of yellow and blue suns, which we've technically modelled like money: An amount and a currency (we'll use *unit* here):",
+      "parameters": {
+        "raw": "| Name | Type     | Description                                               |\n| ---- | -------- | --------------------------------------------------------- |\n| `id` | `number` | The user id to get the balance for                        |",
+        "path": [
+          {
+            "name": "id",
+            "type": "number",
+            "description": "The user id to get the balance for"
+          }
+        ]
+      },
+      "returns": {
+        "content_type": "application/json",
+        "raw": "```json\n{\n\"title\" : \"Balance\",\n\"type\"  : \"array\",\n\"items\" : {\n\"title\"      : \"Amount\",\n\"type\"       : \"object\",\n\"properties\" : {\n\"amount\" : { \"type\" : \"integer\" },\n\"unit\"   : { \"enum\" : [ \"blue\", \"yellow\"] }\n}\n}\n}\n```",
+        "schema": "{\n\"title\" : \"Balance\",\n\"type\"  : \"array\",\n\"items\" : {\n\"title\"      : \"Amount\",\n\"type\"       : \"object\",\n\"properties\" : {\n\"amount\" : { \"type\" : \"integer\" },\n\"unit\"   : { \"enum\" : [ \"blue\", \"yellow\"] }\n}\n}\n}\n"
+      },
+      "status_codes": {
+        "raw": "| Code  | Description                                               |\n| ----- | --------------------------------------------------------- |\n| `200` | When the account exists                                   |\n| `404` | When the account by the given ID does not exist           |",
+        "table": [
+          {
+            "code": 200,
+            "description": "When the account exists"
+          },
+          {
+            "code": 404,
+            "description": "When the account by the given ID does not exist "
+          }
+        ]
+      },
+      "examples": [
+        {
+          "name": "First example",
+          "raw": "```http\nGET /balances/1549\n\nHTTP/1.1 200\nContent-Type: application/json\n\n[ { \"amount\" : 15 , \"unit\" : \"blue\" } , { \"amount\" : 10 , \"unit\" : \"yellow\" } ]\n```",
+          "request": {
+            "verb": "GET",
+            "uri": "/balances/1549"
+          },
+          "response": {
+            "code": 200,
+            "header": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "payload": "[ { \"amount\" : 15 , \"unit\" : \"blue\" } , { \"amount\" : 10 , \"unit\" : \"yellow\" } ]"
+          }
+        },
+        {
+          "name": "When the user does not exist",
+          "raw": "```http\nGET /balances/0\n\nHTTP/1.1 404\nContent-Type: application/json\n\n{ \"message\" : \"This account does not exist\" }\n```",
+          "request": {
+            "verb": "GET",
+            "uri": "/balances/0"
+          },
+          "response": {
+            "code": 404,
+            "header": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "payload": "{ \"message\" : \"This account does not exist\" }"
+          }
+        }
+      ]
+    }
+  ]
+}
